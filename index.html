@@ -5,494 +5,550 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Learning Claude — A Mini Course for Non-Engineers</title>
 <meta name="description" content="A four-phase mini course on Claude and large language models, built for non-engineers. Roughly 28 hours of work, all resources free.">
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#0c0c1f">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #000000;
-    --bg-elev: #0a0a0a;
-    --text: #e8e8e8;
-    --text-dim: #a0a0a0;
-    --muted: #5a5a5a;
-    --rule: #1a1a1a;
-    --rule-bright: #2a2a2a;
-    --accent: #ff3a30;
-    --accent-dim: rgba(255, 58, 48, 0.5);
-    --accent-glow: rgba(255, 58, 48, 0.25);
-    --display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-    --mono: 'JetBrains Mono', "SF Mono", Menlo, monospace;
+    --bg-page: #0c0c1f;
+    --bg-window: #000000;
+    --chrome-top: #6262a8;
+    --chrome-bot: #2a2a5a;
+    --chrome-bg: #4a4a8a;
+    --chrome-text: #d4d4ff;
+
+    --bevel-light: #ffffff;
+    --bevel-mid: #b8b8c8;
+    --bevel-shadow: #1a1a3a;
+    --bevel-dark: #000000;
+
+    --pixel-green: #00ff00;
+    --pixel-green-dim: #00aa00;
+    --pixel-green-muted: #006600;
+    --pixel-yellow: #ffff66;
+    --pixel-orange: #ff8800;
+    --pixel-red: #ff3030;
+    --select-bg: #0000aa;
+    --select-text: #ffffff;
+
+    --btn-face: #b8b8b8;
+    --btn-face-hover: #c8c8c8;
+    --btn-text: #000000;
+
+    --tahoma: 'Tahoma', 'Verdana', 'Geneva', sans-serif;
+    --pixel: 'VT323', 'Courier New', monospace;
+    --chunky: 'Press Start 2P', 'VT323', monospace;
   }
+
   * { box-sizing: border-box; }
   html, body {
     margin: 0;
     padding: 0;
-    background: var(--bg);
-    color: var(--text);
+    background: var(--bg-page);
+    color: var(--pixel-green);
     overflow-x: hidden;
   }
   body {
-    font-family: var(--display);
-    font-weight: 400;
-    font-size: 17px;
-    line-height: 1.65;
-    -webkit-font-smoothing: antialiased;
+    font-family: var(--tahoma);
+    font-size: 11px;
+    -webkit-font-smoothing: none;
     -moz-osx-font-smoothing: grayscale;
+    image-rendering: pixelated;
+    min-height: 100vh;
   }
   body.locked { overflow: hidden; height: 100vh; }
 
-  /* ─────────────── SPLASH ─────────────── */
+  /* CRT scanline overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.18),
+      rgba(0, 0, 0, 0.18) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+    z-index: 9999;
+    mix-blend-mode: multiply;
+  }
+
+  /* ─────────── BEVELED WINDOW ─────────── */
+  .window {
+    background: var(--bg-window);
+    border-top: 2px solid var(--bevel-mid);
+    border-left: 2px solid var(--bevel-mid);
+    border-bottom: 2px solid var(--bevel-dark);
+    border-right: 2px solid var(--bevel-dark);
+    margin-bottom: 6px;
+  }
+  .window-inner {
+    border-top: 1px solid var(--bevel-light);
+    border-left: 1px solid var(--bevel-light);
+    border-bottom: 1px solid var(--bevel-shadow);
+    border-right: 1px solid var(--bevel-shadow);
+  }
+
+  /* Titlebar — gradient with title + decorative chrome controls */
+  .titlebar {
+    background: linear-gradient(to bottom, var(--chrome-top) 0%, var(--chrome-bg) 50%, var(--chrome-bot) 100%);
+    color: var(--chrome-text);
+    font-family: var(--tahoma);
+    font-size: 10px;
+    font-weight: bold;
+    padding: 3px 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--bevel-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    user-select: none;
+  }
+  .titlebar-text {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .titlebar-text::before,
+  .titlebar-text::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background:
+      repeating-linear-gradient(0deg, var(--chrome-text), var(--chrome-text) 1px, transparent 1px, transparent 2px);
+    opacity: 0.5;
+    min-width: 8px;
+  }
+  .titlebar-text span {
+    flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 24px);
+  }
+  .titlebar-controls {
+    display: flex;
+    gap: 2px;
+    flex-shrink: 0;
+    margin-left: 4px;
+  }
+  .titlebar-controls .ctrl {
+    background: var(--btn-face);
+    color: #000;
+    border-top: 1px solid var(--bevel-light);
+    border-left: 1px solid var(--bevel-light);
+    border-bottom: 1px solid var(--bevel-dark);
+    border-right: 1px solid var(--bevel-dark);
+    width: 14px;
+    height: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-family: var(--tahoma);
+    font-weight: bold;
+  }
+
+  /* ─────────── 3D BUTTONS ─────────── */
+  .btn-3d {
+    background: var(--btn-face);
+    color: var(--btn-text);
+    border-top: 2px solid var(--bevel-light);
+    border-left: 2px solid var(--bevel-light);
+    border-bottom: 2px solid var(--bevel-dark);
+    border-right: 2px solid var(--bevel-dark);
+    font-family: var(--tahoma);
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 100ms;
+  }
+  .btn-3d:hover { background: var(--btn-face-hover); }
+  .btn-3d:active {
+    border-top: 2px solid var(--bevel-dark);
+    border-left: 2px solid var(--bevel-dark);
+    border-bottom: 2px solid var(--bevel-light);
+    border-right: 2px solid var(--bevel-light);
+  }
+  .btn-3d-big {
+    padding: 12px 28px;
+    font-size: 14px;
+    letter-spacing: 1px;
+  }
+
+  /* ─────────── EQUALIZER BARS (animated) ─────────── */
+  .vis {
+    display: inline-flex;
+    gap: 1px;
+    height: 24px;
+    align-items: flex-end;
+    padding: 0 2px;
+    background: #000;
+    border-top: 1px solid var(--bevel-dark);
+    border-left: 1px solid var(--bevel-dark);
+    border-bottom: 1px solid var(--bevel-light);
+    border-right: 1px solid var(--bevel-light);
+  }
+  .vis-bar {
+    width: 3px;
+    background: linear-gradient(to top, var(--pixel-green) 0%, var(--pixel-yellow) 60%, var(--pixel-orange) 100%);
+    animation: bar 1.1s ease-in-out infinite;
+  }
+  @keyframes bar {
+    0%, 100% { height: 15%; }
+    25% { height: 70%; }
+    50% { height: 45%; }
+    75% { height: 90%; }
+  }
+
+  /* ─────────── SPLASH ─────────── */
   .splash {
     position: fixed;
     inset: 0;
-    background: var(--bg);
+    background: var(--bg-page);
+    background-image:
+      radial-gradient(circle at 30% 20%, rgba(80, 80, 180, 0.15) 0%, transparent 40%),
+      radial-gradient(circle at 70% 80%, rgba(120, 60, 180, 0.12) 0%, transparent 50%);
     z-index: 1000;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 32px;
-    transition: opacity 900ms cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: default;
+    padding: 24px;
+    transition: opacity 800ms ease;
   }
-  .splash.dismissed {
-    opacity: 0;
-    pointer-events: none;
-  }
+  .splash.dismissed { opacity: 0; pointer-events: none; }
 
-  /* HAL's eye — small pulsing red dot */
-  .eye {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: var(--accent);
-    box-shadow:
-      0 0 16px var(--accent),
-      0 0 40px var(--accent-glow);
-    margin-bottom: 96px;
-    animation: pulse 3.2s ease-in-out infinite;
+  .splash-window {
+    width: 100%;
+    max-width: 480px;
   }
-  @keyframes pulse {
-    0%, 100% {
-      opacity: 1;
-      box-shadow: 0 0 16px var(--accent), 0 0 40px var(--accent-glow);
-    }
-    50% {
-      opacity: 0.35;
-      box-shadow: 0 0 8px var(--accent), 0 0 20px var(--accent-glow);
-    }
-  }
-
-  .splash-title {
-    font-family: var(--display);
-    font-weight: 500;
-    font-size: clamp(40px, 8vw, 96px);
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+  .splash-body {
+    padding: 24px 20px 20px;
+    background: var(--bg-window);
     text-align: center;
-    margin: 0 0 28px;
-    line-height: 1.05;
-    color: var(--text);
-    text-indent: 0.18em;  /* compensate so optical center matches with letter-spacing */
-  }
-  .splash-subtitle {
-    font-family: var(--mono);
-    font-weight: 400;
-    font-size: 12px;
-    color: var(--text-dim);
-    letter-spacing: 0.32em;
-    text-transform: uppercase;
-    text-align: center;
-    margin: 0 0 120px;
-  }
-  .splash-subtitle .sep {
-    color: var(--muted);
-    margin: 0 14px;
-  }
-
-  .enter-btn {
-    font-family: var(--mono);
-    font-weight: 400;
-    font-size: 13px;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    background: transparent;
-    color: var(--text);
-    border: 1px solid var(--rule-bright);
-    padding: 16px 36px;
-    cursor: pointer;
-    transition: all 250ms ease;
     position: relative;
-    text-indent: 0.28em;
   }
-  .enter-btn:hover,
-  .enter-btn:focus-visible {
-    border-color: var(--accent);
-    color: var(--accent);
-    box-shadow: 0 0 24px var(--accent-glow);
-    outline: none;
-  }
-  .enter-btn .cursor {
-    display: inline-block;
-    width: 8px;
-    height: 13px;
-    background: currentColor;
-    margin-left: 6px;
-    vertical-align: -1px;
-    animation: blink 1.1s steps(2, start) infinite;
-  }
-  @keyframes blink {
-    0%, 50% { opacity: 1; }
-    51%, 100% { opacity: 0; }
-  }
-
-  .splash-hint {
-    position: absolute;
-    bottom: 32px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  .splash-version {
-    position: absolute;
-    top: 32px;
-    left: 32px;
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  .splash-status {
-    position: absolute;
-    top: 32px;
-    right: 32px;
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--muted);
+  .splash-vis-row {
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 24px;
   }
-  .splash-status::before {
-    content: "";
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 0 6px var(--accent);
+  .splash-vis-row .vis { height: 32px; }
+  .splash-vis-row .vis-bar { width: 4px; }
+  .splash-lcd {
+    font-family: var(--pixel);
+    color: var(--pixel-green);
+    font-size: 28px;
+    line-height: 1;
+    padding: 4px 10px;
+    background: #000;
+    border-top: 1px solid var(--bevel-dark);
+    border-left: 1px solid var(--bevel-dark);
+    border-bottom: 1px solid var(--bevel-light);
+    border-right: 1px solid var(--bevel-light);
+    letter-spacing: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+  .splash-title {
+    font-family: var(--chunky);
+    font-size: 18px;
+    color: var(--pixel-green);
+    margin: 8px 0 18px;
+    line-height: 1.4;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 0 var(--bevel-dark);
+  }
+  .splash-sub {
+    font-family: var(--pixel);
+    font-size: 20px;
+    color: var(--pixel-green-dim);
+    margin: 0 0 32px;
+    line-height: 1.2;
+  }
+  .splash-meta {
+    font-family: var(--tahoma);
+    font-size: 10px;
+    color: var(--bevel-mid);
+    margin: 0 0 24px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .splash-play {
+    margin-bottom: 18px;
+  }
+  .splash-play .btn-3d-big {
+    background: linear-gradient(to bottom, #d8d8d8 0%, #a0a0a0 100%);
+  }
+  .splash-hint {
+    font-family: var(--pixel);
+    font-size: 16px;
+    color: var(--pixel-green-muted);
+    margin-top: 8px;
+    animation: blink-text 1.5s steps(2, end) infinite;
+  }
+  @keyframes blink-text {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.3; }
+  }
+  .splash-statusbar {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 8px;
+    background: var(--btn-face);
+    border-top: 1px solid var(--bevel-dark);
+    font-family: var(--tahoma);
+    font-size: 10px;
+    color: #000;
   }
 
-  /* ─────────────── COURSE ─────────────── */
+  /* ─────────── COURSE LAYOUT ─────────── */
   main.course {
-    max-width: 720px;
+    max-width: 880px;
     margin: 0 auto;
-    padding: 120px 32px 140px;
+    padding: 16px;
     opacity: 0;
-    transition: opacity 1200ms cubic-bezier(0.4, 0, 0.2, 1) 200ms;
+    transition: opacity 800ms ease 200ms;
   }
   main.course.revealed { opacity: 1; }
 
-  .header-line {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin: 0 0 32px;
-    display: flex;
-    justify-content: space-between;
-    border-bottom: 1px solid var(--rule);
-    padding-bottom: 16px;
-  }
-  .header-line a {
-    color: var(--muted);
-    border: none;
-    transition: color 200ms;
-  }
-  .header-line a:hover { color: var(--text); }
-
-  h1.course-title {
-    font-family: var(--display);
-    font-weight: 500;
-    font-size: clamp(36px, 6vw, 64px);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    margin: 0 0 16px;
-    line-height: 1.1;
-  }
-  .lead {
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--text-dim);
-    letter-spacing: 0.05em;
-    margin: 0 0 48px;
-  }
-  p { margin: 0 0 18px; color: var(--text-dim); }
-  p.intro { color: var(--text); font-size: 18px; }
-
-  /* Table of contents */
-  nav.toc {
-    margin: 56px 0 80px;
-    padding: 28px 28px;
-    border: 1px solid var(--rule);
-    background: linear-gradient(180deg, var(--bg-elev) 0%, var(--bg) 100%);
-  }
-  .toc-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.32em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin: 0 0 16px;
-  }
-  .toc ol {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    counter-reset: toc;
-  }
-  .toc li {
-    counter-increment: toc;
-    padding: 10px 0;
-    border-top: 1px solid var(--rule);
-    display: flex;
-    align-items: baseline;
-    gap: 16px;
-    font-family: var(--display);
-    font-size: 15px;
-  }
-  .toc li:first-child { border-top: none; }
-  .toc li::before {
-    content: "0" counter(toc);
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--accent);
-    letter-spacing: 0.1em;
-    width: 28px;
-    flex-shrink: 0;
-  }
-  .toc a {
-    color: var(--text);
-    border: none;
-    flex: 1;
-  }
-  .toc a:hover { color: var(--accent); text-shadow: none; }
-  .toc .toc-time {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 0.08em;
-  }
-
-  /* Phase sections */
-  .phase {
-    margin: 96px 0;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 800ms ease, transform 800ms ease;
-  }
-  .phase.in-view {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .phase-marker {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.32em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin: 0 0 16px;
+  /* Top "Now Playing" window */
+  .nowplaying-body {
+    padding: 12px;
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 16px;
+    background: var(--bg-window);
   }
-  .phase-marker::after {
-    content: "";
+  .nowplaying-info {
     flex: 1;
-    height: 1px;
-    background: linear-gradient(90deg, var(--accent-dim) 0%, transparent 100%);
+    min-width: 0;
   }
-  h2.phase-title {
-    font-family: var(--display);
-    font-weight: 500;
-    font-size: clamp(28px, 4.5vw, 44px);
-    letter-spacing: 0.01em;
-    margin: 0 0 8px;
-    line-height: 1.15;
-    color: var(--text);
+  .nowplaying-track {
+    font-family: var(--pixel);
+    font-size: 20px;
+    color: var(--pixel-green);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.1;
   }
-  .phase-time {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--muted);
-    letter-spacing: 0.12em;
-    margin: 0 0 24px;
-    text-transform: uppercase;
+  .nowplaying-album {
+    font-family: var(--pixel);
+    font-size: 16px;
+    color: var(--pixel-green-dim);
+    margin-top: 4px;
+  }
+  .nowplaying-time {
+    font-family: var(--pixel);
+    color: var(--pixel-green);
+    font-size: 22px;
+    padding: 6px 12px;
+    background: #000;
+    border-top: 1px solid var(--bevel-dark);
+    border-left: 1px solid var(--bevel-dark);
+    border-bottom: 1px solid var(--bevel-light);
+    border-right: 1px solid var(--bevel-light);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 1px;
+    flex-shrink: 0;
   }
 
-  /* Resources */
-  ol.resources {
-    list-style: none;
-    padding: 0;
-    margin: 32px 0;
-    counter-reset: r;
-  }
-  ol.resources > li {
-    counter-increment: r;
-    padding: 24px 0 24px 56px;
-    border-top: 1px solid var(--rule);
-    position: relative;
-    transition: background 250ms;
-  }
-  ol.resources > li:last-child { border-bottom: 1px solid var(--rule); }
-  ol.resources > li:hover { background: var(--bg-elev); }
-  ol.resources > li::before {
-    content: counter(r, decimal-leading-zero);
-    position: absolute;
-    left: 0;
-    top: 26px;
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--accent);
-    letter-spacing: 0.1em;
-  }
-  .resource-title {
-    display: inline-block;
-    font-family: var(--display);
-    font-weight: 500;
+  /* Description / intro window */
+  .intro-body {
+    padding: 16px 18px;
+    background: var(--bg-window);
+    font-family: var(--pixel);
+    color: var(--pixel-green-dim);
     font-size: 18px;
-    color: var(--text);
-    margin-bottom: 6px;
-    border-bottom: 1px solid transparent;
-    transition: border-color 200ms, color 200ms;
+    line-height: 1.4;
   }
-  a.resource-title { color: var(--text); }
-  a.resource-title:hover {
-    color: var(--accent);
-    border-bottom-color: var(--accent);
+  .intro-body p { margin: 0 0 12px; }
+  .intro-body p:last-child { margin-bottom: 0; }
+  .intro-body strong { color: var(--pixel-green); font-weight: normal; }
+
+  /* Playlist window — the core */
+  .playlist-body {
+    background: #000;
+    padding: 0;
   }
-  .resource-meta {
-    display: block;
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    margin-bottom: 12px;
+  .playlist-section-header {
+    background: linear-gradient(to right, #1a1a4a, #0a0a2a);
+    color: var(--pixel-yellow);
+    font-family: var(--pixel);
+    font-size: 18px;
+    padding: 4px 10px;
+    border-top: 1px solid #3a3a7a;
+    border-bottom: 1px solid #000;
+    letter-spacing: 1px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
   }
-  .tag {
-    display: inline-block;
-    border: 1px solid var(--rule-bright);
-    color: var(--text-dim);
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    padding: 2px 8px;
-    margin-right: 10px;
-    vertical-align: 1px;
-  }
-  .resource-note {
-    font-family: var(--display);
-    font-size: 15px;
-    color: var(--text-dim);
-    margin: 0;
-    line-height: 1.6;
-  }
-  .resource-note a {
-    color: var(--accent);
-    border-bottom: 1px solid var(--accent-dim);
-  }
-  .resource-note a:hover {
-    border-bottom-color: var(--accent);
+  .playlist-section-header:first-child { border-top: none; }
+  .playlist-section-header .ph-meta {
+    color: var(--pixel-green-dim);
+    font-size: 14px;
+    letter-spacing: 0.5px;
   }
 
-  /* Output callout */
+  /* Track row */
+  .track {
+    display: flex;
+    align-items: baseline;
+    font-family: var(--pixel);
+    font-size: 19px;
+    color: var(--pixel-green);
+    padding: 2px 10px;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    line-height: 1.15;
+    cursor: pointer;
+    gap: 8px;
+  }
+  .track:hover {
+    background: var(--select-bg);
+    color: var(--select-text);
+  }
+  .track:hover .t-time,
+  .track:hover .t-num { color: var(--select-text); }
+  .track-num {
+    color: var(--pixel-green);
+    width: 2.2em;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
+  .track-title {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .track-time {
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+    color: var(--pixel-green);
+  }
+  .t-num, .t-time { color: var(--pixel-green); }
+
+  /* Description rows (sub-track, smaller dimmer text) */
+  .track-desc {
+    padding: 0 10px 6px 50px;
+    font-family: var(--tahoma);
+    font-size: 11px;
+    color: var(--pixel-green-muted);
+    line-height: 1.45;
+    border-bottom: 1px dotted #1a3a1a;
+  }
+  .track-desc a {
+    color: var(--pixel-yellow);
+    text-decoration: underline;
+  }
+  .track-desc a:hover { color: var(--pixel-orange); }
+  .track-tag {
+    display: inline-block;
+    color: var(--pixel-green-dim);
+    font-family: var(--tahoma);
+    font-size: 9px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-right: 6px;
+    padding: 1px 5px;
+    border: 1px solid var(--pixel-green-muted);
+    background: rgba(0, 100, 0, 0.15);
+  }
+
+  /* Playlist bottom button bar */
+  .playlist-foot {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    background: var(--btn-face);
+    padding: 3px;
+    border-top: 2px solid var(--bevel-dark);
+    gap: 3px;
+  }
+  .playlist-foot-left,
+  .playlist-foot-right {
+    display: flex;
+    gap: 2px;
+  }
+  .playlist-foot .btn-3d {
+    padding: 3px 10px;
+    font-size: 10px;
+  }
+  .playlist-foot-lcd {
+    background: #000;
+    color: var(--pixel-green);
+    font-family: var(--pixel);
+    font-size: 16px;
+    padding: 2px 10px;
+    border-top: 1px solid var(--bevel-dark);
+    border-left: 1px solid var(--bevel-dark);
+    border-bottom: 1px solid var(--bevel-light);
+    border-right: 1px solid var(--bevel-light);
+    letter-spacing: 1px;
+    font-variant-numeric: tabular-nums;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Output callout — styled like a dialog box */
   .output {
-    border: 1px solid var(--rule-bright);
-    border-left: 3px solid var(--accent);
-    background: var(--bg-elev);
-    padding: 20px 24px;
-    margin: 32px 0 0;
-    font-family: var(--display);
-    font-size: 15px;
-    color: var(--text);
+    margin: 0 10px 8px;
+    padding: 8px 10px;
+    border-top: 1px solid var(--pixel-green-muted);
+    border-left: 1px solid var(--pixel-green-muted);
+    border-bottom: 1px solid var(--pixel-green-dim);
+    border-right: 1px solid var(--pixel-green-dim);
+    background: rgba(0, 50, 0, 0.25);
+    font-family: var(--tahoma);
+    font-size: 11px;
+    color: var(--pixel-green);
   }
   .output strong {
     display: block;
-    font-family: var(--mono);
+    font-family: var(--tahoma);
     font-size: 10px;
+    color: var(--pixel-yellow);
     text-transform: uppercase;
-    letter-spacing: 0.32em;
-    color: var(--accent);
-    font-weight: 500;
-    margin-bottom: 8px;
+    letter-spacing: 1.5px;
+    margin-bottom: 4px;
+    font-weight: bold;
   }
 
-  /* Section divider */
-  hr.divider {
-    border: none;
-    height: 1px;
-    background: linear-gradient(90deg, transparent 0%, var(--rule-bright) 50%, transparent 100%);
-    margin: 96px 0;
-  }
-
-  h3.section {
-    font-family: var(--display);
-    font-weight: 500;
-    font-size: 22px;
-    letter-spacing: 0.02em;
-    margin: 64px 0 12px;
-    color: var(--text);
-  }
-
-  /* Final principle block */
-  .principle {
-    border-top: 1px solid var(--rule);
-    padding-top: 32px;
-    margin-top: 64px;
-  }
-  .principle .label {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.32em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin: 0 0 12px;
-  }
-  .principle p {
-    font-size: 17px;
-    color: var(--text);
-  }
-
+  /* Footer */
   footer {
-    margin-top: 96px;
-    padding-top: 24px;
-    border-top: 1px solid var(--rule);
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    margin-top: 12px;
+    padding: 6px 10px;
+    background: var(--btn-face);
+    border-top: 2px solid var(--bevel-light);
+    color: #000;
+    font-family: var(--tahoma);
+    font-size: 10px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
   }
-  footer p { margin: 0 0 8px; color: var(--muted); }
-  footer a { color: var(--text-dim); border-bottom: 1px solid var(--rule-bright); }
-  footer a:hover { color: var(--accent); border-bottom-color: var(--accent); }
-
-  /* generic links inside course body */
-  main.course a:not(.resource-title):not(.toc a):not(.header-line a):not(footer a) {
-    color: var(--accent);
-    text-decoration: none;
-    border-bottom: 1px solid var(--accent-dim);
-    transition: border-color 200ms;
+  footer a {
+    color: #000;
+    font-weight: bold;
+    text-decoration: underline;
   }
 
   /* Reduced motion */
@@ -502,249 +558,358 @@
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
     }
-    .phase { opacity: 1; transform: none; }
     main.course { opacity: 1; }
+    .vis-bar { height: 50%; }
   }
 
   /* Mobile */
   @media (max-width: 600px) {
-    main.course { padding: 80px 20px 80px; }
-    .splash-version, .splash-status { font-size: 9px; }
-    .splash-subtitle { margin-bottom: 80px; }
-    .eye { margin-bottom: 64px; }
-    ol.resources > li { padding-left: 0; padding-top: 28px; }
-    ol.resources > li::before { position: static; display: block; margin-bottom: 8px; }
+    body { font-size: 12px; }
+    .splash-title { font-size: 14px; }
+    .splash-sub { font-size: 17px; }
+    .track { font-size: 16px; padding: 3px 8px; }
+    .track-title { white-space: normal; overflow: visible; text-overflow: clip; }
+    .track-desc { padding-left: 36px; font-size: 11px; }
+    .nowplaying-track { font-size: 16px; white-space: normal; }
+    .nowplaying-time { font-size: 18px; }
+    .playlist-section-header { font-size: 15px; }
+    .playlist-foot { flex-wrap: wrap; }
   }
 </style>
 </head>
 <body class="locked">
 
-<!-- ───────── SPLASH ───────── -->
-<div class="splash" id="splash" role="dialog" aria-label="Welcome screen — click Enter to begin">
-  <div class="splash-version">v1.0 · 2026</div>
-  <div class="splash-status">System ready</div>
+<!-- ─────────────────── SPLASH ─────────────────── -->
+<div class="splash" id="splash" role="dialog" aria-label="Welcome screen — click Play to begin">
+  <div class="splash-window window">
+    <div class="window-inner">
+      <div class="titlebar">
+        <div class="titlebar-text"><span>WINAMP — Learning Claude v1.0</span></div>
+        <div class="titlebar-controls">
+          <div class="ctrl" aria-hidden="true">_</div>
+          <div class="ctrl" aria-hidden="true">▢</div>
+          <div class="ctrl" aria-hidden="true">×</div>
+        </div>
+      </div>
 
-  <div class="eye" aria-hidden="true"></div>
+      <div class="splash-body">
+        <div class="splash-vis-row" aria-hidden="true">
+          <div class="vis">
+            <div class="vis-bar" style="animation-delay:-0.0s;animation-duration:0.9s"></div>
+            <div class="vis-bar" style="animation-delay:-0.3s;animation-duration:1.1s"></div>
+            <div class="vis-bar" style="animation-delay:-0.5s;animation-duration:0.7s"></div>
+            <div class="vis-bar" style="animation-delay:-0.8s;animation-duration:1.3s"></div>
+            <div class="vis-bar" style="animation-delay:-0.2s;animation-duration:0.85s"></div>
+            <div class="vis-bar" style="animation-delay:-0.6s;animation-duration:1.0s"></div>
+            <div class="vis-bar" style="animation-delay:-0.9s;animation-duration:0.95s"></div>
+            <div class="vis-bar" style="animation-delay:-0.4s;animation-duration:1.2s"></div>
+            <div class="vis-bar" style="animation-delay:-0.1s;animation-duration:0.8s"></div>
+            <div class="vis-bar" style="animation-delay:-0.7s;animation-duration:1.05s"></div>
+            <div class="vis-bar" style="animation-delay:-0.35s;animation-duration:0.92s"></div>
+            <div class="vis-bar" style="animation-delay:-0.55s;animation-duration:1.15s"></div>
+            <div class="vis-bar" style="animation-delay:-0.15s;animation-duration:0.78s"></div>
+            <div class="vis-bar" style="animation-delay:-0.75s;animation-duration:1.08s"></div>
+            <div class="vis-bar" style="animation-delay:-0.45s;animation-duration:0.98s"></div>
+            <div class="vis-bar" style="animation-delay:-0.65s;animation-duration:1.22s"></div>
+          </div>
+          <div class="splash-lcd" aria-hidden="true">00:00</div>
+        </div>
 
-  <h1 class="splash-title">Learning Claude</h1>
-  <p class="splash-subtitle">
-    A mini course<span class="sep">·</span>For non-engineers<span class="sep">·</span>~28 hours
-  </p>
+        <h1 class="splash-title">LEARNING<br>CLAUDE</h1>
+        <p class="splash-sub">A mini course for non-engineers</p>
+        <p class="splash-meta">4 phases &nbsp;·&nbsp; ~28 hours &nbsp;·&nbsp; all free</p>
 
-  <button class="enter-btn" id="enter-btn" type="button" autofocus>
-    [ Enter<span class="cursor" aria-hidden="true"></span> ]
-  </button>
+        <div class="splash-play">
+          <button class="btn-3d btn-3d-big" id="enter-btn" type="button" autofocus>
+            ▶ &nbsp; PLAY
+          </button>
+        </div>
 
-  <div class="splash-hint">Press enter or click to begin</div>
+        <p class="splash-hint">PRESS PLAY OR HIT ENTER</p>
+      </div>
+
+      <div class="splash-statusbar">
+        <span>kbps 128 &nbsp; khz 44 &nbsp; stereo</span>
+        <span>READY</span>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- ───────── COURSE ───────── -->
+<!-- ─────────────────── COURSE ─────────────────── -->
 <main class="course" id="course">
 
-  <div class="header-line">
-    <span>Learning Claude · v1</span>
-    <span><a href="https://github.com/joshuablufstein/learning-claude" target="_blank" rel="noopener">github.com/joshuablufstein</a></span>
+  <!-- Now Playing window -->
+  <div class="window">
+    <div class="window-inner">
+      <div class="titlebar">
+        <div class="titlebar-text"><span>WINAMP — Now Playing</span></div>
+        <div class="titlebar-controls">
+          <div class="ctrl" aria-hidden="true">_</div>
+          <div class="ctrl" aria-hidden="true">×</div>
+        </div>
+      </div>
+      <div class="nowplaying-body">
+        <div class="vis" aria-hidden="true">
+          <div class="vis-bar" style="animation-delay:-0.1s;animation-duration:0.9s"></div>
+          <div class="vis-bar" style="animation-delay:-0.4s;animation-duration:1.0s"></div>
+          <div class="vis-bar" style="animation-delay:-0.2s;animation-duration:0.85s"></div>
+          <div class="vis-bar" style="animation-delay:-0.7s;animation-duration:1.1s"></div>
+          <div class="vis-bar" style="animation-delay:-0.55s;animation-duration:0.78s"></div>
+          <div class="vis-bar" style="animation-delay:-0.3s;animation-duration:1.05s"></div>
+          <div class="vis-bar" style="animation-delay:-0.85s;animation-duration:0.95s"></div>
+          <div class="vis-bar" style="animation-delay:-0.45s;animation-duration:1.15s"></div>
+        </div>
+        <div class="nowplaying-info">
+          <div class="nowplaying-track">▶ Learning Claude — A Mini Course</div>
+          <div class="nowplaying-album">Track 00 of 15 · album: For Non-Engineers</div>
+        </div>
+        <div class="nowplaying-time" aria-hidden="true">28:00</div>
+      </div>
+    </div>
   </div>
 
-  <h1 class="course-title">Learning Claude</h1>
-  <p class="lead">A mini course for non-engineers · ~28 hours · every resource free</p>
+  <!-- Intro / about window -->
+  <div class="window">
+    <div class="window-inner">
+      <div class="titlebar">
+        <div class="titlebar-text"><span>README.TXT</span></div>
+        <div class="titlebar-controls">
+          <div class="ctrl" aria-hidden="true">_</div>
+          <div class="ctrl" aria-hidden="true">×</div>
+        </div>
+      </div>
+      <div class="intro-body">
+        <p>Built for someone who already uses Claude or ChatGPT regularly and wants to <strong>close the gap between using AI well and understanding how it actually works.</strong> No coding background needed.</p>
+        <p>Not a class. A sequence of free resources arranged in the order they make most sense to consume. Each phase ends with a tangible output so you know the gap closed.</p>
+        <p>Click any track below to play.</p>
+      </div>
+    </div>
+  </div>
 
-  <p class="intro">Built for someone who already uses Claude or ChatGPT regularly and wants to close the gap between using AI well and understanding how it actually works. It assumes no coding background. If you can navigate a browser and follow written instructions, you can finish it.</p>
+  <!-- Playlist window — the main thing -->
+  <div class="window">
+    <div class="window-inner">
+      <div class="titlebar">
+        <div class="titlebar-text"><span>Winamp Playlist Editor — Learning Claude.M3U</span></div>
+        <div class="titlebar-controls">
+          <div class="ctrl" aria-hidden="true">_</div>
+          <div class="ctrl" aria-hidden="true">▢</div>
+          <div class="ctrl" aria-hidden="true">×</div>
+        </div>
+      </div>
 
-  <p>It's not a class. It's a sequence of free resources — videos, short books, hands-on tutorials — arranged in the order they make most sense to consume. Each phase ends with a tangible output so you know the gap closed.</p>
+      <div class="playlist-body">
 
-  <nav class="toc" aria-label="Course contents">
-    <p class="toc-label">Course</p>
-    <ol>
-      <li><a href="#phase-1">What an LLM actually is</a><span class="toc-time">~5 hr</span></li>
-      <li><a href="#phase-2">The plumbing</a><span class="toc-time">~5 hr</span></li>
-      <li><a href="#phase-3">Prompting and Claude specifically</a><span class="toc-time">~8 hr</span></li>
-      <li><a href="#phase-4">Coding literacy and ship something</a><span class="toc-time">~10–15 hr</span></li>
-    </ol>
-  </nav>
+        <!-- ── PHASE 01 ── -->
+        <div class="playlist-section-header">
+          <span>═══ PHASE 01 ─ WHAT AN LLM ACTUALLY IS ═══</span>
+          <span class="ph-meta">~5:00:00</span>
+        </div>
 
-  <!-- ── PHASE 1 ── -->
-  <section class="phase" id="phase-1">
-    <p class="phase-marker">Phase 01</p>
-    <h2 class="phase-title">What an LLM actually is</h2>
-    <p class="phase-time">~5 hours · foundational mental model</p>
-    <p>The biggest gap. You don't have a clear picture of what Claude is doing when it answers you, why it hallucinates, what training and inference mean, what a token is. Fix this first — everything else hangs on it.</p>
+        <a class="track" href="https://www.youtube.com/watch?v=zjkBMFhNj_g" target="_blank" rel="noopener">
+          <span class="track-num t-num">01.</span>
+          <span class="track-title">Andrej Karpathy — Intro to Large Language Models</span>
+          <span class="track-time t-time">1:00:00</span>
+        </a>
+        <p class="track-desc"><span class="track-tag">Video</span>The single best plain-language explanation of the technology, by one of the people who built it. Start here.</p>
 
-    <ol class="resources">
-      <li>
-        <a class="resource-title" href="https://www.youtube.com/watch?v=zjkBMFhNj_g" target="_blank" rel="noopener">[1hr Talk] Intro to Large Language Models</a>
-        <span class="resource-meta"><span class="tag">Video</span> Andrej Karpathy · ~1 hour</span>
-        <p class="resource-note">The single best plain-language explanation of the technology, by one of the people who built it. Start here.</p>
-      </li>
-      <li>
-        <a class="resource-title" href="https://www.youtube.com/watch?v=7xTGNNLPyMI" target="_blank" rel="noopener">Deep Dive into LLMs like ChatGPT</a>
-        <span class="resource-meta"><span class="tag">Video</span> Andrej Karpathy · ~3.5 hours · optional</span>
-        <p class="resource-note">Longer second pass if the Intro clicked and you want more depth. Skip if not.</p>
-      </li>
-      <li>
-        <a class="resource-title" href="https://www.youtube.com/watch?v=aircAruvnKk" target="_blank" rel="noopener">But what is a neural network?</a>
-        <span class="resource-meta"><span class="tag">Video</span> 3Blue1Brown · ~19 min</span>
-        <p class="resource-note">Visual intuition for what a neural network actually computes. Pair with the next one.</p>
-      </li>
-      <li>
-        <a class="resource-title" href="https://www.youtube.com/watch?v=IHZwWFHWa-w" target="_blank" rel="noopener">Gradient descent, how neural networks learn</a>
-        <span class="resource-meta"><span class="tag">Video</span> 3Blue1Brown · ~21 min</span>
-        <p class="resource-note">Chapter 2 of the same series. How a network gets better with training, visualized.</p>
-      </li>
-    </ol>
+        <a class="track" href="https://www.youtube.com/watch?v=7xTGNNLPyMI" target="_blank" rel="noopener">
+          <span class="track-num t-num">02.</span>
+          <span class="track-title">Andrej Karpathy — Deep Dive into LLMs like ChatGPT</span>
+          <span class="track-time t-time">3:30:00</span>
+        </a>
+        <p class="track-desc"><span class="track-tag">Video · Optional</span>Longer second pass if the Intro clicked and you want more depth. Skip if not.</p>
 
-    <p class="output"><strong>Output</strong>You can explain in plain English what tokens, training, context windows, and hallucinations are — without looking anything up.</p>
-  </section>
+        <a class="track" href="https://www.youtube.com/watch?v=aircAruvnKk" target="_blank" rel="noopener">
+          <span class="track-num t-num">03.</span>
+          <span class="track-title">3Blue1Brown — But what is a neural network?</span>
+          <span class="track-time t-time">0:19:00</span>
+        </a>
+        <p class="track-desc"><span class="track-tag">Video</span>Visual intuition for what a neural network actually computes. Pair with the next one.</p>
 
-  <!-- ── PHASE 2 ── -->
-  <section class="phase" id="phase-2">
-    <p class="phase-marker">Phase 02</p>
-    <h2 class="phase-title">The plumbing</h2>
-    <p class="phase-time">~5 hours · the layer underneath the model</p>
-    <p>What's actually happening when you open Terminal, run code, hit an API, push to a repo. Words like server, shell, package, library, port — what they really mean, with examples you can run yourself.</p>
+        <a class="track" href="https://www.youtube.com/watch?v=IHZwWFHWa-w" target="_blank" rel="noopener">
+          <span class="track-num t-num">04.</span>
+          <span class="track-title">3Blue1Brown — Gradient descent, how neural networks learn</span>
+          <span class="track-time t-time">0:21:00</span>
+        </a>
+        <p class="track-desc"><span class="track-tag">Video</span>Chapter 2 of the same series. How a network gets better with training, visualized.</p>
 
-    <ol class="resources">
-      <li>
-        <a class="resource-title" href="https://missing.csail.mit.edu/" target="_blank" rel="noopener">The Missing Semester of Your CS Education</a>
-        <span class="resource-meta"><span class="tag">Course</span> MIT · free · do two lectures</span>
-        <p class="resource-note">Built for non-engineers who need the practical scaffolding nobody teaches. Watch two specific lectures: <a href="https://missing.csail.mit.edu/2020/shell-tools/" target="_blank" rel="noopener">The Shell</a> and <a href="https://missing.csail.mit.edu/2020/version-control/" target="_blank" rel="noopener">Version Control (Git)</a>. ~1.5 hours combined.</p>
-      </li>
-      <li>
-        <a class="resource-title" href="https://jvns.ca/" target="_blank" rel="noopener">Julia Evans' blog and zines</a>
-        <span class="resource-meta"><span class="tag">Posts</span> jvns.ca · free · browse</span>
-        <p class="resource-note">Plain-language illustrated explanations of shell, git, networking, debugging. Browse the index, read whatever looks unfamiliar. Famous for making this stuff click.</p>
-      </li>
-    </ol>
+        <p class="output"><strong>► Output</strong>You can explain in plain English what tokens, training, context windows, and hallucinations are — without looking anything up.</p>
 
-    <p class="output"><strong>Output</strong>You can define server, API, repo, package, library, terminal, shell, port, and cache in your own words.</p>
-  </section>
+        <!-- ── PHASE 02 ── -->
+        <div class="playlist-section-header">
+          <span>═══ PHASE 02 ─ THE PLUMBING ═══</span>
+          <span class="ph-meta">~5:00:00</span>
+        </div>
 
-  <!-- ── PHASE 3 ── -->
-  <section class="phase" id="phase-3">
-    <p class="phase-marker">Phase 03</p>
-    <h2 class="phase-title">Prompting and Claude specifically</h2>
-    <p class="phase-time">~8 hours · making implicit skills explicit</p>
-    <p>You already do a lot of this by instinct. The point of this phase is making it formal, so you know what techniques you're using and when to reach for which one.</p>
+        <a class="track" href="https://missing.csail.mit.edu/" target="_blank" rel="noopener">
+          <span class="track-num t-num">05.</span>
+          <span class="track-title">MIT — The Missing Semester of Your CS Education</span>
+          <span class="track-time t-time">1:30:00</span>
+        </a>
+        <p class="track-desc"><span class="track-tag">Course</span>Built for non-engineers who need the practical scaffolding nobody teaches. Watch two specific lectures: <a href="https://missing.csail.mit.edu/2020/shell-tools/" target="_blank" rel="noopener">The Shell</a> and <a href="https://missing.csail.mit.edu/2020/version-control/" target="_blank" rel="noopener">Version Control (Git)</a>. ~1.5 hours combined.</p>
 
-    <ol class="resources">
-      <li>
-        <a class="resource-title" href="https://github.com/anthropics/prompt-eng-interactive-tutorial" target="_blank" rel="noopener">Prompt Engineering Interactive Tutorial</a>
-        <span class="resource-meta"><span class="tag">Hands-on</span> Anthropic · ~2 hours</span>
-        <p class="resource-note">The canonical resource. Free, on GitHub, with exercises you actually run. Do the whole thing.</p>
-      </li>
-      <li>
-        <a class="resource-title" href="https://www.anthropic.com/ai-fluency" target="_blank" rel="noopener">AI Fluency: Framework &amp; Foundations</a>
-        <span class="resource-meta"><span class="tag">Course</span> Anthropic · free</span>
-        <p class="resource-note">Higher-altitude framework for working with AI well — written by Anthropic for non-engineer professionals.</p>
-      </li>
-      <li>
-        <a class="resource-title" href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Building Effective Agents</a>
-        <span class="resource-meta"><span class="tag">Post</span> Anthropic · ~30 min read</span>
-        <p class="resource-note">The clearest writeup of when to use a single prompt vs. a workflow vs. an agent. Read it twice.</p>
-      </li>
-      <li>
-        <a class="resource-title" href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview" target="_blank" rel="noopener">Anthropic prompt engineering documentation</a>
-        <span class="resource-meta"><span class="tag">Docs</span> Anthropic · skim · reference</span>
-        <p class="resource-note">Reference material. Skim once for the landscape, then come back when you need a specific technique.</p>
-      </li>
-      <li>
-        <a class="resource-title" href="https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/overview" target="_blank" rel="noopener">Tool use overview</a>
-        <span class="resource-meta"><span class="tag">Docs</span> Anthropic · skim</span>
-        <p class="resource-note">How Claude calls external tools (search, calculators, APIs). The mechanism behind every agent and MCP integration.</p>
-      </li>
-      <li>
-        <a class="resource-title" href="https://modelcontextprotocol.io/" target="_blank" rel="noopener">Model Context Protocol overview</a>
-        <span class="resource-meta"><span class="tag">Docs</span> Anthropic · skim</span>
-        <p class="resource-note">The open protocol that lets Claude connect to your tools (Gmail, Notion, your file system, etc.). You'll touch this anytime you set up an integration.</p>
-      </li>
-    </ol>
+        <a class="track" href="https://jvns.ca/" target="_blank" rel="noopener">
+          <span class="track-num t-num">06.</span>
+          <span class="track-title">Julia Evans — Blog and Zines</span>
+          <span class="track-time t-time">~1:00:00</span>
+        </a>
+        <p class="track-desc"><span class="track-tag">Posts</span>Plain-language illustrated explanations of shell, git, networking, debugging. Browse the index, read whatever looks unfamiliar.</p>
 
-    <p class="output"><strong>Output</strong>You can name the prompt patterns you already use — role, structure, examples, constraints, chain-of-thought — and articulate when to reach for an agent vs. a single prompt.</p>
-  </section>
+        <p class="output"><strong>► Output</strong>You can define server, API, repo, package, library, terminal, shell, port, and cache in your own words.</p>
 
-  <!-- ── PHASE 4 ── -->
-  <section class="phase" id="phase-4">
-    <p class="phase-marker">Phase 04</p>
-    <h2 class="phase-title">Coding literacy and ship something</h2>
-    <p class="phase-time">~10–15 hours · where the gap actually closes</p>
-    <p>You don't need to become a programmer. You need enough Python to read what Claude writes, modify it, and debug an error without being stuck. Then you ship one working automation so the loop is closed.</p>
+        <!-- ── PHASE 03 ── -->
+        <div class="playlist-section-header">
+          <span>═══ PHASE 03 ─ PROMPTING & CLAUDE ═══</span>
+          <span class="ph-meta">~8:00:00</span>
+        </div>
 
-    <ol class="resources">
-      <li>
-        <a class="resource-title" href="https://automatetheboringstuff.com/" target="_blank" rel="noopener">Automate the Boring Stuff with Python</a>
-        <span class="resource-meta"><span class="tag">Book</span> Al Sweigart · free online · first 6 chapters</span>
-        <p class="resource-note">Project-based Python primer written explicitly for non-engineers. Do the first six chapters — that's enough to read most scripts.</p>
-      </li>
-      <li>
-        <a class="resource-title" href="https://docs.n8n.io/" target="_blank" rel="noopener">n8n documentation</a>
-        <span class="resource-meta"><span class="tag">Docs</span> n8n · do the Quickstart</span>
-        <p class="resource-note">Workflow orchestration without writing code from scratch. Do the official Quickstart, then build one real workflow that automates something you actually do.</p>
-      </li>
-      <li>
-        <span class="resource-title">Ship one automation</span>
-        <span class="resource-meta"><span class="tag">Project</span> ~5–8 hours</span>
-        <p class="resource-note">Pick something concrete and small: a recurring newsletter, a routine document handoff, a data pull. Build it in n8n or as a Python script with Claude's help. Read every line before you run it — no copying without understanding.</p>
-      </li>
-    </ol>
+        <a class="track" href="https://github.com/anthropics/prompt-eng-interactive-tutorial" target="_blank" rel="noopener">
+          <span class="track-num t-num">07.</span>
+          <span class="track-title">Anthropic — Prompt Engineering Interactive Tutorial</span>
+          <span class="track-time t-time">2:00:00</span>
+        </a>
+        <p class="track-desc"><span class="track-tag">Hands-on</span>The canonical resource. Free, on GitHub, with exercises you actually run. Do the whole thing.</p>
 
-    <p class="output"><strong>Output</strong>You ship one automation that runs without you, and you can read an unfamiliar Python script and roughly explain it.</p>
-  </section>
+        <a class="track" href="https://www.anthropic.com/ai-fluency" target="_blank" rel="noopener">
+          <span class="track-num t-num">08.</span>
+          <span class="track-title">Anthropic — AI Fluency: Framework &amp; Foundations</span>
+          <span class="track-time t-time">2:00:00</span>
+        </a>
+        <p class="track-desc"><span class="track-tag">Course</span>Higher-altitude framework for working with AI well — written by Anthropic for non-engineer professionals.</p>
 
-  <hr class="divider">
+        <a class="track" href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">
+          <span class="track-num t-num">09.</span>
+          <span class="track-title">Anthropic — Building Effective Agents</span>
+          <span class="track-time t-time">0:30:00</span>
+        </a>
+        <p class="track-desc"><span class="track-tag">Post</span>The clearest writeup of when to use a single prompt vs. a workflow vs. an agent. Read it twice.</p>
 
-  <section class="phase" id="diet">
-    <p class="phase-marker">Ongoing</p>
-    <h2 class="phase-title">Weekly diet</h2>
-    <p>Replace AI Twitter with these two. Both free, both written by people who actually use the tools, both update on a regular cadence.</p>
+        <a class="track" href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview" target="_blank" rel="noopener">
+          <span class="track-num t-num">10.</span>
+          <span class="track-title">Anthropic — Prompt Engineering Documentation</span>
+          <span class="track-time t-time">1:00:00</span>
+        </a>
+        <p class="track-desc"><span class="track-tag">Docs · Reference</span>Skim once for the landscape, then come back when you need a specific technique.</p>
 
-    <ol class="resources">
-      <li>
-        <a class="resource-title" href="https://www.oneusefulthing.org/" target="_blank" rel="noopener">One Useful Thing</a>
-        <span class="resource-meta"><span class="tag">Newsletter</span> Ethan Mollick · weekly-ish</span>
-        <p class="resource-note">Wharton professor writing for non-engineer professionals. Pragmatic, grounded in actual experiments, no hype cycle.</p>
-      </li>
-      <li>
-        <a class="resource-title" href="https://simonwillison.net/" target="_blank" rel="noopener">Simon Willison's blog</a>
-        <span class="resource-meta"><span class="tag">Blog</span> Simon Willison · frequent · short posts</span>
-        <p class="resource-note">Developer but plain-spoken. Current, accurate, no fluff. The single best signal-to-noise source on what's actually shipping.</p>
-      </li>
-    </ol>
-  </section>
+        <a class="track" href="https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/overview" target="_blank" rel="noopener">
+          <span class="track-num t-num">11.</span>
+          <span class="track-title">Anthropic — Tool Use Overview</span>
+          <span class="track-time t-time">1:00:00</span>
+        </a>
+        <p class="track-desc"><span class="track-tag">Docs</span>How Claude calls external tools (search, calculators, APIs). The mechanism behind every agent and MCP integration.</p>
 
-  <div class="principle">
-    <p class="label">One principle</p>
-    <p>Every phase ends with an output you can demonstrate, not a feeling that you "learned" it. Tests, not vibes. If you can't articulate the output in your own words, you haven't finished the phase yet.</p>
+        <a class="track" href="https://modelcontextprotocol.io/" target="_blank" rel="noopener">
+          <span class="track-num t-num">12.</span>
+          <span class="track-title">Anthropic — Model Context Protocol Overview</span>
+          <span class="track-time t-time">1:30:00</span>
+        </a>
+        <p class="track-desc"><span class="track-tag">Docs</span>The open protocol that lets Claude connect to your tools (Gmail, Notion, your file system). You'll touch this anytime you set up an integration.</p>
+
+        <p class="output"><strong>► Output</strong>You can name the prompt patterns you already use — role, structure, examples, constraints, chain-of-thought — and articulate when to reach for an agent vs. a single prompt.</p>
+
+        <!-- ── PHASE 04 ── -->
+        <div class="playlist-section-header">
+          <span>═══ PHASE 04 ─ CODING & SHIP SOMETHING ═══</span>
+          <span class="ph-meta">~12:00:00</span>
+        </div>
+
+        <a class="track" href="https://automatetheboringstuff.com/" target="_blank" rel="noopener">
+          <span class="track-num t-num">13.</span>
+          <span class="track-title">Al Sweigart — Automate the Boring Stuff with Python</span>
+          <span class="track-time t-time">4:00:00</span>
+        </a>
+        <p class="track-desc"><span class="track-tag">Book · Free</span>Project-based Python primer written explicitly for non-engineers. Do the first six chapters — that's enough to read most scripts.</p>
+
+        <a class="track" href="https://docs.n8n.io/" target="_blank" rel="noopener">
+          <span class="track-num t-num">14.</span>
+          <span class="track-title">n8n — Workflow Automation Documentation</span>
+          <span class="track-time t-time">2:00:00</span>
+        </a>
+        <p class="track-desc"><span class="track-tag">Docs</span>Workflow orchestration without writing code from scratch. Do the official Quickstart, then build one real workflow.</p>
+
+        <a class="track" href="#" onclick="return false;">
+          <span class="track-num t-num">15.</span>
+          <span class="track-title">YOU — Ship one real automation</span>
+          <span class="track-time t-time">6:00:00</span>
+        </a>
+        <p class="track-desc"><span class="track-tag">Project</span>Pick something small: a recurring newsletter, a routine document handoff, a data pull. Build it in n8n or as a Python script with Claude's help. Read every line before you run it — no copying without understanding.</p>
+
+        <p class="output"><strong>► Output</strong>You ship one automation that runs without you, and you can read an unfamiliar Python script and roughly explain it.</p>
+
+        <!-- ── ENCORE: ONGOING DIET ── -->
+        <div class="playlist-section-header">
+          <span>═══ ENCORE ─ ONGOING WEEKLY DIET ═══</span>
+          <span class="ph-meta">∞</span>
+        </div>
+
+        <a class="track" href="https://www.oneusefulthing.org/" target="_blank" rel="noopener">
+          <span class="track-num t-num">B1.</span>
+          <span class="track-title">Ethan Mollick — One Useful Thing</span>
+          <span class="track-time t-time">∞</span>
+        </a>
+        <p class="track-desc"><span class="track-tag">Newsletter · Weekly</span>Wharton professor writing for non-engineer professionals. Pragmatic, grounded in actual experiments, no hype cycle.</p>
+
+        <a class="track" href="https://simonwillison.net/" target="_blank" rel="noopener">
+          <span class="track-num t-num">B2.</span>
+          <span class="track-title">Simon Willison — Blog</span>
+          <span class="track-time t-time">∞</span>
+        </a>
+        <p class="track-desc"><span class="track-tag">Blog · Frequent</span>Developer but plain-spoken. Current, accurate, no fluff. The single best signal-to-noise source on what's actually shipping.</p>
+
+        <!-- Final principle as a track too -->
+        <div class="playlist-section-header">
+          <span>═══ LINER NOTES ═══</span>
+          <span class="ph-meta">read once</span>
+        </div>
+        <p class="track-desc" style="padding: 12px 14px; border-bottom: none; color: var(--pixel-green); font-size: 12px;">
+          <strong style="color: var(--pixel-yellow); display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px;">One principle</strong>
+          Every phase ends with an output you can demonstrate, not a feeling that you "learned" it. Tests, not vibes. If you can't articulate the output in your own words, you haven't finished the phase yet.
+        </p>
+
+      </div>
+
+      <!-- Playlist footer buttons (decorative) -->
+      <div class="playlist-foot">
+        <div class="playlist-foot-left">
+          <button class="btn-3d" type="button" disabled style="opacity:0.6;cursor:default" tabindex="-1">+ ADD</button>
+          <button class="btn-3d" type="button" disabled style="opacity:0.6;cursor:default" tabindex="-1">REM</button>
+          <button class="btn-3d" type="button" disabled style="opacity:0.6;cursor:default" tabindex="-1">SEL</button>
+          <button class="btn-3d" type="button" disabled style="opacity:0.6;cursor:default" tabindex="-1">MISC</button>
+        </div>
+        <div class="playlist-foot-lcd">15 tracks · 28:00:00 total</div>
+      </div>
+    </div>
   </div>
 
   <footer>
-    <p>Source on <a href="https://github.com/joshuablufstein/learning-claude" target="_blank" rel="noopener">GitHub</a></p>
-    <p>All links verified at time of publication</p>
+    <span>Source: <a href="https://github.com/joshuablufstein/learning-claude" target="_blank" rel="noopener">github.com/joshuablufstein/learning-claude</a></span>
+    <span>v1.0 · all links verified</span>
   </footer>
 
 </main>
 
 <script>
   (function () {
-    const splash = document.getElementById('splash');
-    const enterBtn = document.getElementById('enter-btn');
-    const course = document.getElementById('course');
-    const body = document.body;
+    var splash = document.getElementById('splash');
+    var enterBtn = document.getElementById('enter-btn');
+    var course = document.getElementById('course');
+    var body = document.body;
 
     function dismiss () {
       if (splash.classList.contains('dismissed')) return;
       splash.classList.add('dismissed');
       course.classList.add('revealed');
       body.classList.remove('locked');
-      // Remove splash from accessibility tree after fade
       setTimeout(function () {
         splash.setAttribute('aria-hidden', 'true');
         splash.style.display = 'none';
-      }, 950);
+      }, 850);
     }
 
     enterBtn.addEventListener('click', dismiss);
 
-    // Keyboard: Enter or Space anywhere on splash dismisses
     document.addEventListener('keydown', function (e) {
       if (splash.classList.contains('dismissed')) return;
       if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
@@ -753,30 +918,9 @@
       }
     });
 
-    // Click anywhere on splash (outside button) also dismisses
     splash.addEventListener('click', function (e) {
       if (e.target === splash) dismiss();
     });
-
-    // IntersectionObserver: fade-in phases as they enter view
-    if ('IntersectionObserver' in window) {
-      const observer = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('in-view');
-            observer.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.1, rootMargin: '0px 0px -80px 0px' });
-      document.querySelectorAll('.phase').forEach(function (el) {
-        observer.observe(el);
-      });
-    } else {
-      // Fallback: just show everything
-      document.querySelectorAll('.phase').forEach(function (el) {
-        el.classList.add('in-view');
-      });
-    }
   })();
 </script>
 
