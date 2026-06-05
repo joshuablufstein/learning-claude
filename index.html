@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Learning Claude — A Mini Course for Non-Engineers</title>
+<meta name="description" content="A four-phase mini course on Claude and large language models, built for non-engineers. Roughly 28 hours of work, all resources free.">
+<style>
+  :root {
+    --bg: #ffffff;
+    --text: #1a1a1a;
+    --muted: #6b6b6b;
+    --rule: #e5e5e5;
+    --link: #0a4d8c;
+    --link-hover: #062f5a;
+    --tag-bg: #f3f1ec;
+    --tag-text: #5a5a5a;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); }
+  body {
+    font-family: Georgia, "Iowan Old Style", "Source Serif Pro", serif;
+    font-size: 18px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  main {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 64px 24px 96px;
+  }
+  h1, h2, h3, .meta, .tag, nav {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  h1 {
+    font-size: 34px;
+    font-weight: 600;
+    line-height: 1.2;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+  }
+  .subtitle {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    color: var(--muted);
+    font-size: 16px;
+    margin: 0 0 40px;
+  }
+  h2 {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 56px 0 4px;
+    letter-spacing: -0.005em;
+  }
+  h2 .phase-num {
+    color: var(--muted);
+    font-weight: 400;
+    margin-right: 8px;
+  }
+  .phase-time {
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 16px;
+  }
+  h3 {
+    font-size: 17px;
+    font-weight: 600;
+    margin: 32px 0 16px;
+    color: #000;
+  }
+  p { margin: 0 0 16px; }
+  a {
+    color: var(--link);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(10, 77, 140, 0.3);
+    transition: border-color 0.15s;
+  }
+  a:hover { color: var(--link-hover); border-bottom-color: var(--link-hover); }
+  ol.resources {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 24px;
+    counter-reset: r;
+  }
+  ol.resources > li {
+    counter-increment: r;
+    padding: 16px 0 16px 36px;
+    border-top: 1px solid var(--rule);
+    position: relative;
+  }
+  ol.resources > li:last-child { border-bottom: 1px solid var(--rule); }
+  ol.resources > li::before {
+    content: counter(r) ".";
+    position: absolute;
+    left: 0;
+    top: 16px;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--muted);
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+  }
+  .resource-title {
+    display: block;
+    margin-bottom: 4px;
+  }
+  .resource-meta {
+    display: block;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .tag {
+    display: inline-block;
+    background: var(--tag-bg);
+    color: var(--tag-text);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-right: 6px;
+    vertical-align: 1px;
+  }
+  .resource-note {
+    font-size: 15px;
+    color: var(--text);
+    margin: 0;
+  }
+  .output {
+    background: #fafaf7;
+    border-left: 3px solid var(--rule);
+    padding: 12px 16px;
+    margin: 16px 0 0;
+    font-size: 15px;
+  }
+  .output strong {
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid var(--rule);
+    margin: 64px 0;
+  }
+  .toc {
+    margin: 0 0 48px;
+    padding: 20px 24px;
+    background: #fafaf7;
+    border-radius: 4px;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 14px;
+  }
+  .toc-title {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    font-weight: 600;
+    margin: 0 0 12px;
+  }
+  .toc ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: toc;
+  }
+  .toc li {
+    counter-increment: toc;
+    padding: 4px 0;
+  }
+  .toc li::before {
+    content: counter(toc) ".";
+    color: var(--muted);
+    margin-right: 8px;
+    font-variant-numeric: tabular-nums;
+  }
+  .toc a { border: none; }
+  .toc-meta { color: var(--muted); font-size: 13px; margin-left: 6px; }
+  footer {
+    margin-top: 80px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  footer p { margin: 0 0 8px; }
+  @media (max-width: 540px) {
+    main { padding: 40px 20px 64px; }
+    h1 { font-size: 28px; }
+    body { font-size: 17px; }
+  }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Learning Claude</h1>
+<p class="subtitle">A mini course for non-engineers. Four phases, roughly 28 hours, every resource free.</p>
+
+<p>This is built for someone who already uses Claude or ChatGPT regularly and wants to close the gap between using AI well and understanding how it actually works. It assumes no coding background. If you can navigate a browser and follow written instructions, you can finish it.</p>
+
+<p>It's not a class. It's a sequence of free resources — videos, short books, hands-on tutorials — arranged in the order they make most sense to consume. Each phase ends with a tangible output so you know the gap closed.</p>
+
+<nav class="toc">
+  <p class="toc-title">Course</p>
+  <ol>
+    <li><a href="#phase-1">What an LLM actually is</a><span class="toc-meta">~5 hr</span></li>
+    <li><a href="#phase-2">The plumbing</a><span class="toc-meta">~5 hr</span></li>
+    <li><a href="#phase-3">Prompting and Claude specifically</a><span class="toc-meta">~8 hr</span></li>
+    <li><a href="#phase-4">Coding literacy and ship something</a><span class="toc-meta">~10&ndash;15 hr</span></li>
+    <li><a href="#diet">Ongoing weekly diet</a></li>
+  </ol>
+</nav>
+
+<h2 id="phase-1"><span class="phase-num">1.</span>What an LLM actually is</h2>
+<p class="phase-time">~5 hours · foundational mental model</p>
+<p>The biggest gap. You don't have a clear picture of what Claude is doing when it answers you, why it hallucinates, what training and inference mean, what a token is. Fix this first — everything else hangs on it.</p>
+
+<ol class="resources">
+  <li>
+    <a class="resource-title" href="https://www.youtube.com/watch?v=zjkBMFhNj_g" target="_blank" rel="noopener">[1hr Talk] Intro to Large Language Models</a>
+    <span class="resource-meta"><span class="tag">Video</span> Andrej Karpathy · ~1 hour</span>
+    <p class="resource-note">The single best plain-language explanation of the technology, by one of the people who built it. Start here.</p>
+  </li>
+  <li>
+    <a class="resource-title" href="https://www.youtube.com/watch?v=7xTGNNLPyMI" target="_blank" rel="noopener">Deep Dive into LLMs like ChatGPT</a>
+    <span class="resource-meta"><span class="tag">Video</span> Andrej Karpathy · ~3.5 hours · optional</span>
+    <p class="resource-note">Longer second pass if the Intro clicked and you want more depth. Skip if not.</p>
+  </li>
+  <li>
+    <a class="resource-title" href="https://www.youtube.com/watch?v=aircAruvnKk" target="_blank" rel="noopener">But what is a neural network?</a>
+    <span class="resource-meta"><span class="tag">Video</span> 3Blue1Brown · ~19 min</span>
+    <p class="resource-note">Visual intuition for what a neural network actually computes. Pair with the next one.</p>
+  </li>
+  <li>
+    <a class="resource-title" href="https://www.youtube.com/watch?v=IHZwWFHWa-w" target="_blank" rel="noopener">Gradient descent, how neural networks learn</a>
+    <span class="resource-meta"><span class="tag">Video</span> 3Blue1Brown · ~21 min</span>
+    <p class="resource-note">Chapter 2 of the same series. How a network gets better with training, visualized.</p>
+  </li>
+</ol>
+
+<p class="output"><strong>Output</strong>You can explain in plain English what tokens, training, context windows, and hallucinations are — without looking anything up.</p>
+
+<h2 id="phase-2"><span class="phase-num">2.</span>The plumbing</h2>
+<p class="phase-time">~5 hours · the layer underneath the model</p>
+<p>What's actually happening when you open Terminal, run code, hit an API, push to a repo. Words like server, shell, package, library, port — what they really mean, with examples you can run yourself.</p>
+
+<ol class="resources">
+  <li>
+    <a class="resource-title" href="https://missing.csail.mit.edu/" target="_blank" rel="noopener">The Missing Semester of Your CS Education</a>
+    <span class="resource-meta"><span class="tag">Course</span> MIT · free · do two lectures</span>
+    <p class="resource-note">Built for non-engineers who need the practical scaffolding nobody teaches. Watch two specific lectures: <a href="https://missing.csail.mit.edu/2020/shell-tools/" target="_blank" rel="noopener">The Shell</a> and <a href="https://missing.csail.mit.edu/2020/version-control/" target="_blank" rel="noopener">Version Control (Git)</a>. ~1.5 hours combined.</p>
+  </li>
+  <li>
+    <a class="resource-title" href="https://jvns.ca/" target="_blank" rel="noopener">Julia Evans' blog and zines</a>
+    <span class="resource-meta"><span class="tag">Posts</span> jvns.ca · free · browse</span>
+    <p class="resource-note">Plain-language illustrated explanations of shell, git, networking, debugging. Browse the index, read whatever looks unfamiliar. Famous for making this stuff click.</p>
+  </li>
+</ol>
+
+<p class="output"><strong>Output</strong>You can define server, API, repo, package, library, terminal, shell, port, and cache in your own words.</p>
+
+<h2 id="phase-3"><span class="phase-num">3.</span>Prompting and Claude specifically</h2>
+<p class="phase-time">~8 hours · making implicit skills explicit</p>
+<p>You already do a lot of this by instinct. The point of this phase is making it formal, so you know what techniques you're using and when to reach for which one.</p>
+
+<ol class="resources">
+  <li>
+    <a class="resource-title" href="https://github.com/anthropics/prompt-eng-interactive-tutorial" target="_blank" rel="noopener">Prompt Engineering Interactive Tutorial</a>
+    <span class="resource-meta"><span class="tag">Hands-on</span> Anthropic · ~2 hours</span>
+    <p class="resource-note">The canonical resource. Free, on GitHub, with exercises you actually run. Do the whole thing.</p>
+  </li>
+  <li>
+    <a class="resource-title" href="https://www.anthropic.com/ai-fluency" target="_blank" rel="noopener">AI Fluency: Framework &amp; Foundations</a>
+    <span class="resource-meta"><span class="tag">Course</span> Anthropic · free</span>
+    <p class="resource-note">Higher-altitude framework for working with AI well — written by Anthropic for non-engineer professionals.</p>
+  </li>
+  <li>
+    <a class="resource-title" href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Building Effective Agents</a>
+    <span class="resource-meta"><span class="tag">Post</span> Anthropic · ~30 min read</span>
+    <p class="resource-note">The clearest writeup of when to use a single prompt vs. a workflow vs. an agent. Read it twice.</p>
+  </li>
+  <li>
+    <a class="resource-title" href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview" target="_blank" rel="noopener">Anthropic prompt engineering documentation</a>
+    <span class="resource-meta"><span class="tag">Docs</span> Anthropic · skim · reference</span>
+    <p class="resource-note">Reference material. Skim once for the landscape, then come back when you need a specific technique.</p>
+  </li>
+  <li>
+    <a class="resource-title" href="https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/overview" target="_blank" rel="noopener">Tool use overview</a>
+    <span class="resource-meta"><span class="tag">Docs</span> Anthropic · skim</span>
+    <p class="resource-note">How Claude calls external tools (search, calculators, APIs). The mechanism behind every agent and MCP integration.</p>
+  </li>
+  <li>
+    <a class="resource-title" href="https://modelcontextprotocol.io/" target="_blank" rel="noopener">Model Context Protocol overview</a>
+    <span class="resource-meta"><span class="tag">Docs</span> Anthropic · skim</span>
+    <p class="resource-note">The open protocol that lets Claude connect to your tools (Gmail, Notion, your file system, etc.). You'll touch this anytime you set up an integration.</p>
+  </li>
+</ol>
+
+<p class="output"><strong>Output</strong>You can name the prompt patterns you already use — role, structure, examples, constraints, chain-of-thought — and articulate when to reach for an agent vs. a single prompt.</p>
+
+<h2 id="phase-4"><span class="phase-num">4.</span>Coding literacy and ship something</h2>
+<p class="phase-time">~10–15 hours · where the gap actually closes</p>
+<p>You don't need to become a programmer. You need enough Python to read what Claude writes, modify it, and debug an error without being stuck. Then you ship one working automation so the loop is closed.</p>
+
+<ol class="resources">
+  <li>
+    <a class="resource-title" href="https://automatetheboringstuff.com/" target="_blank" rel="noopener">Automate the Boring Stuff with Python</a>
+    <span class="resource-meta"><span class="tag">Book</span> Al Sweigart · free online · first 6 chapters</span>
+    <p class="resource-note">Project-based Python primer written explicitly for non-engineers. Do the first six chapters — that's enough to read most scripts.</p>
+  </li>
+  <li>
+    <a class="resource-title" href="https://docs.n8n.io/" target="_blank" rel="noopener">n8n documentation</a>
+    <span class="resource-meta"><span class="tag">Docs</span> n8n · do the Quickstart</span>
+    <p class="resource-note">Workflow orchestration without writing code from scratch. Do the official Quickstart, then build one real workflow that automates something you actually do.</p>
+  </li>
+  <li>
+    <span class="resource-title">Ship one automation</span>
+    <span class="resource-meta"><span class="tag">Project</span> ~5–8 hours</span>
+    <p class="resource-note">Pick something concrete and small: a recurring newsletter, a routine document handoff, a data pull. Build it in n8n or as a Python script with Claude's help. Read every line before you run it — no copying without understanding.</p>
+  </li>
+</ol>
+
+<p class="output"><strong>Output</strong>You ship one automation that runs without you, and you can read an unfamiliar Python script and roughly explain it.</p>
+
+<hr>
+
+<h2 id="diet">Ongoing weekly diet</h2>
+<p>Replace AI Twitter with these two. Both free, both written by people who actually use the tools, both update on a regular cadence.</p>
+
+<ol class="resources">
+  <li>
+    <a class="resource-title" href="https://www.oneusefulthing.org/" target="_blank" rel="noopener">One Useful Thing</a>
+    <span class="resource-meta"><span class="tag">Newsletter</span> Ethan Mollick · weekly-ish</span>
+    <p class="resource-note">Wharton professor writing for non-engineer professionals. Pragmatic, grounded in actual experiments, no hype cycle.</p>
+  </li>
+  <li>
+    <a class="resource-title" href="https://simonwillison.net/" target="_blank" rel="noopener">Simon Willison's blog</a>
+    <span class="resource-meta"><span class="tag">Blog</span> Simon Willison · frequent · short posts</span>
+    <p class="resource-note">Developer but plain-spoken. Current, accurate, no fluff. The single best signal-to-noise source on what's actually shipping.</p>
+  </li>
+</ol>
+
+<hr>
+
+<h3>One principle to hold throughout</h3>
+<p>Every phase ends with an output you can demonstrate, not a feeling that you "learned" it. Tests, not vibes. If you can't articulate the output in your own words, you haven't finished the phase yet.</p>
+
+<footer>
+  <p>Source on <a href="https://github.com/joshuablufstein/learning-claude" target="_blank" rel="noopener">GitHub</a>. Pull requests welcome.</p>
+  <p>All links verified at time of publication. If one breaks, open an issue.</p>
+</footer>
+
+</main>
+</body>
+</html>
